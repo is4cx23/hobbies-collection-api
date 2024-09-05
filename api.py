@@ -39,7 +39,7 @@ def get_livro(id):
         "autor": livro.autor 
     }) if livro else ('', 404)
 
-@app.route('/api/livros', methods=['POST'])
+@app.route('/api/livros/', methods=['POST'])
 def add_livro():
     dados = request.get_json()
     novo_livro = Livro(titulo=dados['titulo'], autor=dados['autor'])
@@ -49,6 +49,35 @@ def add_livro():
         "id":novo_livro.id,
         "titulo": novo_livro.titulo,
         "autor": novo_livro.autor 
+    }), 201
+
+@app.route('/api/livros/<int:id>', methods=['DELETE'])
+def delete_livros(id):
+    livro = Livro.query.get(id)
+
+    if livro is None:
+        return jsonify({"error":"livro não encontrado"}), 404
+    db.session.delete(livro)
+    db.session.commit()
+    return '',204
+
+@app.route('/api/livros/<int:id>', methods=['PUT'])
+def update_livro(id):
+    livro = Livro.query.get(id)
+
+    if livros is None:
+        return jsonify({"error":"livro não encontrado"}), 404
+
+    dados = request.get_json()
+    livro.titulo = dados.get('titulo',livro.titulo)
+    livro.autor = dados.get('autor',livro.autor)
+
+    db.session.commit()
+
+    return jsonify({
+        "id":livro.id,
+        "titulo": livro.titulo,
+        "autor": livro.autor 
     }), 201
 
 if __name__  == '__main__':
